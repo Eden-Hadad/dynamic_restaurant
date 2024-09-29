@@ -28,20 +28,18 @@ const ParentComponent = () => {
   }, []);
 
   const handleTableClick = (tableSize, layoutType) => {
-    // Generate a temporary id for new tables
     const newTable = {
-      tempId: idCounter, // Use tempId for new tables
+      tempId: idCounter,
       size: tableSize,
-      left: 0, // Default position
+      left: 0,
       top: 0,
       inside: layoutType === 'inside',
-      isNew: true // Mark this table as new
+      isNew: true,
     };
 
-    setTables(prevTables => [...prevTables, newTable]); // Ensure new table is added to existing ones
+    setTables((prevTables) => [...prevTables, newTable]);
     setSelectedTable(newTable.tempId);
-
-    setIdCounter(prevId => prevId + 1); // Increment ID counter for new tables
+    setIdCounter((prevId) => prevId + 1);
   };
 
   const handleLayoutChange = (layout) => {
@@ -49,31 +47,25 @@ const ParentComponent = () => {
   };
 
   const handleTableMove = (id, newPosition) => {
-    setTables(prevTables =>
-      prevTables.map(table =>
-        (table.id === id || table.tempId === id)
-          ? { ...table, ...newPosition }
-          : table
+    setTables((prevTables) =>
+      prevTables.map((table) =>
+        table.id === id || table.tempId === id ? { ...table, ...newPosition } : table
       )
     );
   };
-  
 
   const handleDeleteTable = async (id) => {
     try {
-      const table = tables.find(t => t.id === id || t.tempId === id);
+      const table = tables.find((t) => t.id === id || t.tempId === id);
       if (table && table.id) {
         const response = await fetch(`/tables/delete/${table.id}`, {
-          method: 'DELETE'
+          method: 'DELETE',
         });
         if (response.ok) {
-          setTables(tables.filter(t => t.id !== id));
-        } else {
-          const responseData = await response.json();
-          console.error(responseData.message);
+          setTables(tables.filter((t) => t.id !== id));
         }
       } else {
-        setTables(tables.filter(t => t.tempId !== id));
+        setTables(tables.filter((t) => t.tempId !== id));
       }
     } catch (error) {
       console.error('Failed to delete the table:', error);
@@ -86,7 +78,6 @@ const ParentComponent = () => {
     try {
       for (const table of tables) {
         if (table.id && !table.isNew) {
-          // Update existing table
           const response = await fetch(`/tables/update/${table.id}`, {
             method: 'PUT',
             headers: {
@@ -94,7 +85,7 @@ const ParentComponent = () => {
             },
             body: JSON.stringify({
               left: table.left,
-              top: table.top
+              top: table.top,
             }),
           });
 
@@ -102,7 +93,6 @@ const ParentComponent = () => {
             throw new Error('Failed to update table');
           }
         } else if (table.tempId) {
-          // Create new table
           const response = await fetch('/tables/create', {
             method: 'POST',
             headers: {
@@ -115,15 +105,16 @@ const ParentComponent = () => {
             throw new Error('Failed to create table');
           } else {
             const { tableIds } = await response.json();
-            // Update the table with the new ID and remove tempId
-            setTables(prevTables =>
-              prevTables.map(t => (t.tempId === table.tempId ? { ...t, id: tableIds[0], tempId: null, isNew: false } : t))
+            setTables((prevTables) =>
+              prevTables.map((t) =>
+                t.tempId === table.tempId
+                  ? { ...t, id: tableIds[0], tempId: null, isNew: false }
+                  : t
+              )
             );
           }
         }
       }
-
-      console.log('Tables saved successfully');
     } catch (error) {
       console.error('Failed to save tables:', error);
     }
@@ -135,11 +126,13 @@ const ParentComponent = () => {
         <RestaurantLeftSidebar onTableClick={handleTableClick} onLayoutChange={handleLayoutChange} />
         <TableLayout
           selectedTable={selectedTable}
-          tables={tables.filter(table => table.inside === insideLayout)}
+          tables={tables.filter((table) => table.inside === insideLayout)}
           onTableMove={handleTableMove}
           onDeleteTable={handleDeleteTable}
         />
-        <button className='save-layout-button' type='submit'>Save Tables</button>
+        <button className='save-layout-button' type='submit'>
+          Save Tables
+        </button>
       </form>
     </div>
   );
