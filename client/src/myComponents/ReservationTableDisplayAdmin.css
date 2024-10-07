@@ -1,4 +1,3 @@
-/* admin panel */
 .admin-panel-layout {
   margin: 0 auto;
   background-image: url("./images/layoutTable.jpg");
@@ -12,7 +11,6 @@
 
   color: rgb(255, 253, 253);
 }
-/* side bar panel */
 .left-side-container {
   border: #fcf6f6 1px solid;
   display: flex;

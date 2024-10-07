@@ -1,4 +1,3 @@
-/* Reservation Filter Page */
 .reservation-admin-dashboard-container {
   background-color: #ffffff;
   border: 2px solid #7d7d7d;
@@ -66,24 +65,24 @@
 .reservations-table {
   width: 100%;
   margin-top: 20px;
-  border-collapse: collapse; /* Ensures the borders don't double up */
+  border-collapse: collapse; 
 }
 
 .reservations-table table {
   width: 100%;
-  border: 2px solid #333; /* Border around the entire table */
+  border: 2px solid #333; 
 }
 
 .reservations-table th,
 .reservations-table td {
-  border: 1px solid #333; /* Borders around individual cells */
+  border: 1px solid #333; 
   padding: 8px;
   text-align: left;
 }
 
 .reservations-table th {
   background-color: #f4f4f4;
-  border-bottom: 2px solid #333; /* Thicker border for the header */
+  border-bottom: 2px solid #333; 
 }
 
 .reservations-table tr:nth-child(even) {

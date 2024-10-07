@@ -1,6 +1,4 @@
-/* Login Container */
 .login-container {
-  /* Image setup */
   background-image: url("./images/login.avif");
   background-repeat: no-repeat;
   background-size: cover;
@@ -13,7 +11,6 @@
   text-shadow: #000000 2px 2px;
 }
 
-/* Login Form */
 .login-form {
  
 
@@ -31,7 +28,6 @@
   text-align: center;
 }
 
-/* Form Group */
 .login-form-group {
   display: flex;
   align-items: center;
@@ -42,7 +38,6 @@
   color: #000000;
 }
 
-/* Form Button */
 .login-form-button {
   width: 100%;
   font-size: 1.5rem;
@@ -55,7 +50,6 @@
   background-color: #ffae21;
 }
 
-/* Responsive adjustments for smaller screens (tablets, etc.) */
 @media (max-width: 1024px) {
   .login-container {
     width: 95%;

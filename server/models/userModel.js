@@ -23,7 +23,7 @@ const userModel = {
           console.error("Find user error:", error);
           reject(error);
         } else {
-          resolve(results[0]); // Assuming email is unique
+          resolve(results[0]); 
         }
       });
     });

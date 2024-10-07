@@ -7,7 +7,7 @@ import MainPage from './myComponents/MainPage';
 import Reservation from './myComponents/Reservation';
 import ParentComponent from './myComponents/ParentComponent';
 import UserReservations from './myComponents/UserReservations';
-import ReservationFilterPage from './myComponents/ReservationFilterPage'; // Import the new component
+import ReservationFilterPage from './myComponents/ReservationFilterPage'; 
 
 
 function App() {
@@ -21,8 +21,7 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      // Decode token and set user (assuming the token contains user info)
-      setUser({ id: 1, email: 'user@example.com' }); // Replace with actual decoding logic
+      setUser({ id: 1, email: 'user@example.com' }); 
     }
   }, []);
 
@@ -37,7 +36,7 @@ function App() {
         <Route path="/reservation" element={user ? <Reservation user={user} /> : <Navigate to="/login" />} />
         <Route path="/admin" element={user && user.id === 1 ? <ParentComponent /> : <Navigate to="/" />} />
         <Route path="/my-reservations" element={user ? <UserReservations userId={user.id} /> : <Navigate to="/login" />} />
-        <Route path="/reservations-filter" element={user && user.id === 1 ? <ReservationFilterPage /> : <Navigate to="/" />} /> {/* Only Reservations Filter */}
+        <Route path="/reservations-filter" element={user && user.id === 1 ? <ReservationFilterPage /> : <Navigate to="/" />} /> {}
         <Route path="*" element={<Navigate replace to="/" />} />
       </Routes>      
     </BrowserRouter>

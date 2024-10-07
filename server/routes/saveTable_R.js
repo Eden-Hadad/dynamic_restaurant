@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const tableModel = require('../models/saveTable_M');
-const db = require('../db');  // Ensure db is imported
+const db = require('../db');  
 
-// Endpoint to update a table's position
 router.put('/update/:id', async (req, res) => {
   try {
     const id = req.params.id;
@@ -17,7 +16,6 @@ router.put('/update/:id', async (req, res) => {
   }
 });
 
-// Endpoint to delete a table
 router.delete('/delete/:id', async (req, res) => {
   try {
     const id = req.params.id;
@@ -29,7 +27,6 @@ router.delete('/delete/:id', async (req, res) => {
   }
 });
 
-// Endpoint to get all tables
 router.get('/', async (req, res) => {
   try {
     const tables = await tableModel.getTablePositions();
@@ -40,7 +37,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Endpoint to get available tables for a specific date and location
 router.get('/available', async (req, res) => {
   try {
     const { location, date } = req.query;
@@ -52,7 +48,6 @@ router.get('/available', async (req, res) => {
   }
 });
 
-// Endpoint to get reservations for a specific user
 router.get('/user-reservations/:userId', async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -65,7 +60,6 @@ router.get('/user-reservations/:userId', async (req, res) => {
   }
 });
 
-// Endpoint to create a reservation
 router.post('/reserve', async (req, res) => {
   try {
     const { tableId, quantity, date, location, userId } = req.body;
@@ -85,7 +79,6 @@ router.post('/reserve', async (req, res) => {
   }
 });
 
-// Endpoint to delete a reservation
 router.delete('/reservation/:id', async (req, res) => {
   try {
     const reservationId = req.params.id;
@@ -97,7 +90,6 @@ router.delete('/reservation/:id', async (req, res) => {
   }
 });
 
-// Endpoint to fetch reservations with filters
 router.get('/reservations', async (req, res) => {
   try {
     const { year, month, startDate, endDate } = req.query;
@@ -112,7 +104,6 @@ router.get('/reservations', async (req, res) => {
 
     const params = [];
 
-    // Filter by year and month if provided
     if (year) {
       sql += ` AND YEAR(r.date) = ?`;
       params.push(year);
@@ -122,14 +113,11 @@ router.get('/reservations', async (req, res) => {
       params.push(month);
     }
 
-    // Filter by date range if startDate and endDate are provided
     if (startDate && endDate) {
       sql += ` AND r.date BETWEEN ? AND DATE_ADD(?, INTERVAL 1 DAY)`;
       params.push(startDate, endDate);
     }
-    
 
-    // Query the database
     db.query(sql, params, (error, results) => {
       if (error) {
         console.error('Failed to fetch reservations:', error);
@@ -144,10 +132,6 @@ router.get('/reservations', async (req, res) => {
   }
 });
 
-
-
-
-// Endpoint to create new tables
 router.post('/create', async (req, res) => {
   try {
     const tables = req.body;

@@ -1,6 +1,4 @@
-/*reservation settings = parrent component*/
 .reservation-container {
-  /*image setup*/
   background-image: url("./images/layout.avif");
   background-repeat: no-repeat;
   background-size: cover;
@@ -21,7 +19,6 @@
   width: 50%;
   font-size: 3rem;
 }
-/*reservation form settin = children component*/
 .reservation-form-container {
  
 

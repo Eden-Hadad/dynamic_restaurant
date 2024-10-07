@@ -8,24 +8,25 @@ const ParentComponent = () => {
   const [selectedTable, setSelectedTable] = useState(null);
   const [idCounter, setIdCounter] = useState(1);
   const [insideLayout, setInsideLayout] = useState(true);
-
+  const [saving, setSaving] = useState(false); 
   useEffect(() => {
-    const fetchTables = async () => {
-      try {
-        const response = await fetch('/tables');
-        if (!response.ok) {
-          throw new Error('Failed to fetch tables');
-        }
-        const tables = await response.json();
-        setTables(Array.isArray(tables) ? tables : []);
-      } catch (error) {
-        console.error(error);
-        setTables([]);
-      }
-    };
-
     fetchTables();
   }, []);
+
+  const fetchTables = async () => {
+    try {
+      setTables([]);
+      const response = await fetch(`/tables`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch tables');
+      }
+      const tables = await response.json();
+      setTables(Array.isArray(tables) ? tables : []);
+    } catch (error) {
+      console.error(error);
+      setTables([]);
+    }
+  };
 
   const handleTableClick = (tableSize, layoutType) => {
     const newTable = {
@@ -62,10 +63,10 @@ const ParentComponent = () => {
           method: 'DELETE',
         });
         if (response.ok) {
-          setTables(tables.filter((t) => t.id !== id));
+          setTables((prevTables) => prevTables.filter((t) => t.id !== id));
         }
       } else {
-        setTables(tables.filter((t) => t.tempId !== id));
+        setTables((prevTables) => prevTables.filter((t) => t.tempId !== id));
       }
     } catch (error) {
       console.error('Failed to delete the table:', error);
@@ -74,6 +75,10 @@ const ParentComponent = () => {
 
   const handleSaveTables = async (e) => {
     e.preventDefault();
+
+    if (saving) return;
+
+    setSaving(true);  
 
     try {
       for (const table of tables) {
@@ -115,23 +120,27 @@ const ParentComponent = () => {
           }
         }
       }
+      fetchTables();
     } catch (error) {
       console.error('Failed to save tables:', error);
+    } finally {
+      setSaving(false);  
     }
   };
 
   return (
     <div className='admin-panel-layout'>
+      <RestaurantLeftSidebar onTableClick={handleTableClick} onLayoutChange={handleLayoutChange} />
+
       <form onSubmit={handleSaveTables} className="save-panel-admin">
-        <RestaurantLeftSidebar onTableClick={handleTableClick} onLayoutChange={handleLayoutChange} />
         <TableLayout
           selectedTable={selectedTable}
           tables={tables.filter((table) => table.inside === insideLayout)}
           onTableMove={handleTableMove}
           onDeleteTable={handleDeleteTable}
         />
-        <button className='save-layout-button' type='submit'>
-          Save Tables
+        <button className='save-layout-button' type='submit' disabled={saving}>
+          {saving ? 'Saving...' : 'Save Tables'}
         </button>
       </form>
     </div>

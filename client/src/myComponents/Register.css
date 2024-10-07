@@ -52,17 +52,17 @@
   justify-content: center;
   
   font-size: 1.5rem;
-  width: 100%; /* Adjust this as needed */
+  width: 100%;
   border-radius: 30px;
   color: #000000;
 }
 .register-button {
-  width: 100%; /* Adjust width as needed */
+  width: 100%; 
   border-radius: 30px;
   font-size: 1.5rem;
   background-color: #fd9610ef;
   color: #000000;
-  margin-top: 10px ; /* Optional: space above button */
+  margin-top: 10px ;
 }
 
 .register-button:hover {

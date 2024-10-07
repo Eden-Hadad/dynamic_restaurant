@@ -24,7 +24,6 @@ function Login({ setUser }) {
         localStorage.setItem('token', data.token);
         setUser(data.user);
 
-        // Redirect based on user role
         if (data.user.id === 1) {
           navigate('/dashboard');
         } else {

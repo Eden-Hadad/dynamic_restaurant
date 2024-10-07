@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import LineChart from "./LineChart"; // Import LineChart component
+import LineChart from "./LineChart"; 
 import "./ReservationFilterPage.css";
 
 function ReservationFilterPage() {
@@ -7,7 +7,7 @@ function ReservationFilterPage() {
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [week, setWeek] = useState(null);
-  const [view, setView] = useState("daily"); // New state for selecting the chart view (daily, monthly, etc.)
+  const [view, setView] = useState("daily"); 
 
   useEffect(() => {
     fetchReservations();
@@ -92,7 +92,6 @@ function ReservationFilterPage() {
     }));
   };
 
-  // Filter reservation data based on the selected view (daily, monthly, etc.)
   const getFilteredData = () => {
     if (!reservations.length) return { labels: [], data: [] };
 

@@ -1,7 +1,6 @@
 const db = require('../db');
 
 const tableModel = {
-  // Method to update a table's position
   updateTable: (id, updatedData) => {
     return new Promise((resolve, reject) => {
       const sql = 'UPDATE tables SET x = ?, y = ? WHERE id = ?';
@@ -17,7 +16,6 @@ const tableModel = {
     });
   },
 
-  // Method to create a new table
   createTable: (tableData) => {
     return new Promise((resolve, reject) => {
       const sql = 'INSERT INTO tables (x, y, size, inside) VALUES (?, ?, ?, ?)';
@@ -33,7 +31,6 @@ const tableModel = {
     });
   },
 
-  // Method to delete a table
   deleteTable: (id) => {
     return new Promise((resolve, reject) => {
       const sql = 'DELETE FROM tables WHERE id = ?';
@@ -49,16 +46,11 @@ const tableModel = {
     });
   },
 
-  // Method to get all table positions
   getTablePositions: () => {
     return new Promise((resolve, reject) => {
       const sql = `
         SELECT t.id, t.x, t.y, t.size, t.inside,
-               CASE 
-                 WHEN r.id IS NOT NULL 
-                 AND r.date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL '1:30' HOUR_MINUTE)
-                 THEN 1 ELSE 0 
-               END AS reserved
+               CASE WHEN r.id IS NOT NULL THEN 1 ELSE 0 END AS reserved
         FROM tables t
         LEFT JOIN reservations r ON t.id = r.table_id AND r.date = CURDATE()
       `;
@@ -69,11 +61,11 @@ const tableModel = {
         } else {
           const tables = results.map(table => ({
             id: table.id,
-            left: table.x,
-            top: table.y,
+            left: table.x, 
+            top: table.y,  
             size: table.size,
             inside: table.inside === 1,
-            reserved: table.reserved === 1,
+            reserved: table.reserved === 1
           }));
           resolve(tables);
         }
@@ -81,23 +73,22 @@ const tableModel = {
     });
   },
 
-  // Method to get available tables for a specific date and location
   getAvailableTables: (location, date) => {
     return new Promise((resolve, reject) => {
       const sql = `
         SELECT t.id, t.x, t.y, t.size, t.inside,
-               CASE WHEN r.id IS NOT NULL 
-               AND r.date BETWEEN DATE_SUB(?, INTERVAL '1:30' HOUR_MINUTE) 
-               AND DATE_ADD(?, INTERVAL '1:30' HOUR_MINUTE)
-               THEN 1 ELSE 0 END AS reserved
+               GROUP_CONCAT(r.date ORDER BY r.date ASC) AS reservations  -- Get all reservation times in a list
         FROM tables t
-        LEFT JOIN reservations r ON t.id = r.table_id
+        LEFT JOIN reservations r ON t.id = r.table_id AND DATE(r.date) = DATE(?)  -- Only fetch reservations for the selected date
         WHERE t.inside = ?
+        GROUP BY t.id
       `;
-      db.query(sql, [date, date, location === 'inside'], (error, results) => {
+  
+      const isInside = location === 'inside' ? 1 : 0;
+      db.query(sql, [date, isInside], (error, results) => {
         if (error) {
-          console.error('Error fetching tables:', error);
-          reject('Error fetching tables');
+          console.error('Error fetching available tables:', error);
+          reject('Error fetching available tables');
         } else {
           const tables = results.map(table => ({
             id: table.id,
@@ -105,47 +96,48 @@ const tableModel = {
             top: table.y,
             size: table.size,
             inside: table.inside === 1,
-            reserved: table.reserved === 1,
+            reservations: table.reservations ? table.reservations.split(',') : []  
           }));
           resolve(tables);
         }
       });
     });
-  },
+  },  
+  
 
-  // Method to create a reservation with time overlap check
   createReservation: ({ tableId, quantity, date, location, userId }) => {
     return new Promise((resolve, reject) => {
-      // First, check if the table is already reserved for the same date and time (with 1.5-hour window)
-      const checkOverlapSql = `
-        SELECT * FROM reservations 
-        WHERE table_id = ? 
-        AND (date BETWEEN ? AND DATE_ADD(?, INTERVAL '1:30' HOUR_MINUTE)
-        OR date BETWEEN DATE_SUB(?, INTERVAL '1:30' HOUR_MINUTE) AND ?)
+      const sqlCheck = `
+        SELECT id FROM reservations
+        WHERE table_id = ?
+        AND location = ?
+        AND (
+          (? BETWEEN date AND DATE_ADD(date, INTERVAL 90 MINUTE))
+          OR (DATE_ADD(?, INTERVAL 90 MINUTE) BETWEEN date AND DATE_ADD(date, INTERVAL 90 MINUTE))
+        )
       `;
-      db.query(checkOverlapSql, [tableId, date, date, date, date], (error, results) => {
+  
+      db.query(sqlCheck, [tableId, location, date, date], (error, results) => {
         if (error) {
-          return reject('Error checking for overlapping reservations');
+          console.error('Error checking reservations:', error);
+          reject('Error checking reservations');
+        } else if (results.length > 0) {
+          reject('This table is already reserved during this time.');
+        } else {
+          const sqlInsert = 'INSERT INTO reservations (table_id, how_many, date, location, user_id) VALUES (?, ?, ?, ?, ?)';
+          db.query(sqlInsert, [tableId, quantity, date, location, userId], (error, result) => {
+            if (error) {
+              console.error('Error creating reservation:', error);
+              reject('Error creating reservation');
+            } else {
+              resolve(result);
+            }
+          });
         }
-
-        if (results.length > 0) {
-          // If there's an overlapping reservation, reject the reservation
-          return reject('The table is already reserved for this time period.');
-        }
-
-        // If no overlap, proceed to create the reservation
-        const sql = 'INSERT INTO reservations (table_id, how_many, date, location, user_id) VALUES (?, ?, ?, ?, ?)';
-        db.query(sql, [tableId, quantity, date, location, userId], (error, result) => {
-          if (error) {
-            return reject('Error creating reservation');
-          }
-          resolve(result);
-        });
       });
     });
   },
 
-  // Method to get reservations for a user
   getUserReservations: (userId) => {
     return new Promise((resolve, reject) => {
       const sql = `
@@ -166,7 +158,6 @@ const tableModel = {
     });
   },
 
-  // Method to delete a reservation
   deleteReservation: (reservationId) => {
     return new Promise((resolve, reject) => {
       const sql = 'DELETE FROM reservations WHERE id = ?';

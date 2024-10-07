@@ -6,7 +6,7 @@ const LeftSidebar = ({ onTableClick, onLayoutChange }) => {
 
   const handleLayoutChange = (layout) => {
     setLayoutType(layout);
-    onLayoutChange(layout);
+    onLayoutChange(layout);  
   };
 
   return (
@@ -18,13 +18,13 @@ const LeftSidebar = ({ onTableClick, onLayoutChange }) => {
             className="layout-option"
             onClick={() => handleLayoutChange("inside")}
           >
-            <button className="table-option">Inside Layout</button>
+            <button className="table-option" type="button">Inside Layout</button> {}
           </div>
           <div
             className="layout-option"
             onClick={() => handleLayoutChange("outside")}
           >
-            <button className="table-option">Outside Layout</button>
+            <button className="table-option" type="button">Outside Layout</button> {}
           </div>
           <h3>Table Sizes</h3>
           <div
